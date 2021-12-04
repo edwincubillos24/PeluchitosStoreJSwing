@@ -4,6 +4,12 @@
  */
 package peluchitosstoreui;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import model.Peluchito;
@@ -114,7 +120,38 @@ public class Buscar extends javax.swing.JFrame {
 
     private void buscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarButtonActionPerformed
         String nombre = nombreTextField.getText();
-        boolean existePeluche = false;
+
+        if (nombre.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debe digitar el nombre del peluche");
+        } else {
+            String dbURL = "jdbc:mysql://localhost:3306/peluchitosstore";
+            String username = "root";
+            String password = "123456";
+            try {
+                Connection conn = DriverManager.getConnection(dbURL, username, password);
+
+                String sql = "SELECT * FROM peluchitos WHERE nombre = '" + nombre + "'";
+                Statement statement = conn.createStatement();
+
+                ResultSet result = statement.executeQuery(sql);
+
+                if (result.next()) {
+                    referenciaLabel.setText("Referencia: " + result.getString(2));
+                    precioLabel.setText(String.valueOf("Precio: " + result.getDouble(4)));
+                    cantidadLabel.setText(String.valueOf("Cantidad: " + result.getInt(5)));
+                    tamanoLabel.setText("Tamaño: " + result.getString(6));
+                } else {
+                    JOptionPane.showMessageDialog(null, "Peluche no encontrado");
+                }
+
+                conn.close();
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        /*    boolean existePeluche = false;
         for (int i = 0; i < listaPeluches.size(); i++) {
             if (nombre.equals(listaPeluches.get(i).getNombre())) {
                 referenciaLabel.setText("Referencia: " + listaPeluches.get(i).getReferencia());
@@ -125,7 +162,7 @@ public class Buscar extends javax.swing.JFrame {
             }
         }
         if (!existePeluche)
-            JOptionPane.showMessageDialog(null, "Peluche no encontrado");
+            JOptionPane.showMessageDialog(null, "Peluche no encontrado");*/
     }//GEN-LAST:event_buscarButtonActionPerformed
 
     /**

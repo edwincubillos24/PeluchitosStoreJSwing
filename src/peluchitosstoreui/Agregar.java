@@ -1,6 +1,5 @@
 package peluchitosstoreui;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -167,9 +166,8 @@ public class Agregar extends javax.swing.JFrame {
             try{
             Connection conn = DriverManager.getConnection(dbURL, username, password);
             
-            if (conn != null){
-                System.out.println("Conexión Exítosa");
-            }
+            if (conn != null)
+                System.out.println("Conexión Exítosa");            
             
             String sql = "INSERT INTO peluchitos (id, referencia, nombre, precio, cantidad, tamano)"
                     + "VALUES(NULL, ?, ?, ?, ?, ?)";
@@ -181,12 +179,19 @@ public class Agregar extends javax.swing.JFrame {
             statement.setInt(4, cantidad);
             statement.setInt(5, tamano);
             
-            statement.executeUpdate();
+            int rowInserted = statement.executeUpdate();
+            if (rowInserted > 0){
+                JOptionPane.showMessageDialog(null, "Peluchito almacenado exitosamente");
+            } else {
+                JOptionPane.showMessageDialog(null, "ERROR, Peluchito no almacenó");
+            }
+            
+            conn.close();
             
             }catch (SQLException ex){
                 ex.printStackTrace();
             }
-            
+                        
           //  Peluchito peluchito = new Peluchito(nombre, tamano, referencia, cantidad, precio);
           //  menu.agregarPeluche(peluchito);
 

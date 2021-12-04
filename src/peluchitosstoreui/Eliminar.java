@@ -4,6 +4,12 @@
  */
 package peluchitosstoreui;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author escoo
@@ -11,6 +17,7 @@ package peluchitosstoreui;
 public class Eliminar extends javax.swing.JFrame {
 
     private Menu menu;
+
     /**
      * Creates new form Eliminar
      */
@@ -77,8 +84,35 @@ public class Eliminar extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
+
         String nombre = nombreTextField.getText();
-        menu.eliminarPeluche(nombre);        
+        //menu.eliminarPeluche(nombre);
+
+        if (nombre.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debe digitar el nombre del peluche");
+        } else {
+            //Conexión con JDBC
+            String dbURL = "jdbc:mysql://localhost:3306/peluchitosstore";
+            String username = "root";
+            String password = "123456";
+            try {
+                Connection conn = DriverManager.getConnection(dbURL, username, password);
+
+                String sql = "DELETE FROM peluchitos WHERE nombre = ?";
+                PreparedStatement statement = conn.prepareStatement(sql);
+                statement.setString(1, nombre);
+                int rowsDeleted = statement.executeUpdate();
+                if (rowsDeleted > 0) {
+                    JOptionPane.showMessageDialog(null, "Borrado exitoso del peluchito");
+                } else {
+                    JOptionPane.showMessageDialog(null, "El peluche no existe");
+                }                
+                conn.close();
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
     }//GEN-LAST:event_eliminarButtonActionPerformed
 
     /**

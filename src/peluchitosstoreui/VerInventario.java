@@ -4,7 +4,13 @@
  */
 package peluchitosstoreui;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.Peluchito;
 
@@ -14,9 +20,9 @@ import model.Peluchito;
  */
 public class VerInventario extends javax.swing.JFrame {
 
-    ArrayList<Peluchito> listaPeluches = new ArrayList<Peluchito>();
-    
+    // ArrayList<Peluchito> listaPeluches = new ArrayList<Peluchito>();
     DefaultTableModel dtm = new DefaultTableModel();
+
     /**
      * Creates new form VerInventario
      */
@@ -25,20 +31,35 @@ public class VerInventario extends javax.swing.JFrame {
     }
 
     VerInventario(ArrayList<Peluchito> listaPeluches) {
-        this.listaPeluches = listaPeluches;
+        //    this.listaPeluches = listaPeluches;
         initComponents();
-        String titulos[]={"Referencia", "Nombre", "Tamaño", "Cantidad", "Precio"};
+        String titulos[] = {"Referencia", "Nombre", "Precio", "Cantidad", "Tamaño"};
         dtm.setColumnIdentifiers(titulos);
         inventarioTable.setModel(dtm);
-        
-        String datos[] = new String[5];
-        for (int i=0; i<listaPeluches.size(); i++){
-            datos[0] = listaPeluches.get(i).getReferencia();
-            datos[1] = listaPeluches.get(i).getNombre();
-            datos[2] = listaPeluches.get(i).getTamano();
-            datos[3] = String.valueOf(listaPeluches.get(i).getCantidad());
-            datos[4] = String.valueOf(listaPeluches.get(i).getPrecio());
-            dtm.addRow(datos);
+
+        String dbURL = "jdbc:mysql://localhost:3306/peluchitosstore";
+        String username = "root";
+        String password = "123456";
+        try {
+            Connection conn = DriverManager.getConnection(dbURL, username, password);
+
+            String sql = "SELECT * FROM peluchitos";
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery(sql);
+
+            String datos[] = new String[5];
+            while (result.next()) {
+                datos[0] = result.getString(2);
+                datos[1] = result.getString(3);
+                datos[2] = String.valueOf(result.getDouble(4));
+                datos[3] = String.valueOf(result.getInt(5));
+                datos[4] = result.getString(6);
+                dtm.addRow(datos);
+            }
+            conn.close();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 
